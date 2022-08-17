@@ -19,7 +19,7 @@ on run {action}
 	end if
 	
 	try
-		tell application "Google Chrome Personal"
+		tell application "Google Chrome Grebban"
 			if URL of active tab of first window contains "webdevsimplified.com" or URL of active tab of first window contains "udemy.com" then
 				activate
 				set foundMediaPlayer to true
@@ -61,7 +61,7 @@ on run {action}
 	end try
 	
 	try
-		tell application "Google Chrome Personal"
+		tell application "Google Chrome Music"
 			if URL of active tab of first window contains "youtube" then
 				if (action as string) is equal to "play" then
 					tell active tab of front window to execute javascript "document.getElementsByClassName('ytp-play-button ytp-button')[0].click();"
