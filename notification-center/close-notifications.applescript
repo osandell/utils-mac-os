@@ -11,12 +11,13 @@ tell application "System Events"
 			# This is the clear all button when multiple notifications are expanded
 			# Try using this first. If it doesn't exist it means the notifications
 			# are collapsed and we need to use another method of closing.
-			tell button 2 of UI element 1 of scroll area 1 of theWindow
+			tell button 2 of UI element 1 of scroll area 1 of group 1 of theWindow
 				if exists then
+					
 					click
 				else
 					try
-						set theActions to actions of group 1 of UI element 1 of scroll area 1 of theWindow
+						set theActions to actions of group 1 of UI element 1 of scroll area 1 of group 1 of theWindow
 						
 						# Try to close the whole group first. If that fails, close individual windows.
 						repeat with theAction in theActions
@@ -29,7 +30,7 @@ tell application "System Events"
 						end repeat
 						
 						repeat with theAction in theActions
-							if description of theAction is "St√§ng" then
+							if description of theAction is "Stäng" then
 								set closed to true
 								tell theWindow
 									perform theAction
