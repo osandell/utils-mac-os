@@ -1,6 +1,6 @@
 # Browser Media Control
 
-This is a collection of scripts for playing, pausing, fast forwarding and rewinding media in browsers.
+This is a collection of scripts for playing, pausing, fast forwarding and rewinding media.
 
 ## Usage
 Activate the script files from for example Karabiner with Osascript
