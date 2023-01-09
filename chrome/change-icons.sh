@@ -2,7 +2,7 @@
 
 # FileIcon is installed via Brew: https://formulae.brew.sh/formula/fileicon
 
-# Put the .plist file in ~/Library/LaunchAgents to launch at login
+# This script is easily run on startup by using pm2: https://pm2.keymetrics.io/docs/usage/quick-start/
 
 /usr/local/bin/fswatch -0 /Applications | while read -d "" event
   do 
