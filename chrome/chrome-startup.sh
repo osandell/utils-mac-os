@@ -1,5 +1,49 @@
 #!/bin/bash
 
+# Sort out the Chrome windows after reboot since Mac OS gets confused when you
+# have multiple instances of the same app running.
+osascript <<END
+set volume with output muted
+tell application "Google Chrome" to quit
+delay 2
+do shell script "open -a Google\\\ Chrome\\\ Grebban"
+delay 3
+do shell script "open -a Chrome\\\ Music"
+do shell script "open -a Chrome\\\ Dev"
+do shell script "open -a Chrome\\\ Personal"
+delay 3
+
+tell application "Google Chrome Music" to tell the active tab of its first window to reload
+
+tell application "Google Chrome Grebban"
+  set window_list to every window
+  
+  repeat with the_window in window_list
+    set tab_list to every tab in the_window
+    
+    repeat with the_tab in tab_list
+      if the title of the_tab is "Google" then
+        close the_tab
+      end if
+    end repeat
+  end repeat
+
+  activate
+end tell
+
+delay 10
+
+tell application "Finder"
+	set mediaPlayerAction to (path to home folder as text) & "dev:osandell:scripts-osx:media-playback-control:media-player-action.applescript" as alias
+end tell
+run script mediaPlayerAction with parameters {"play"}
+delay 1
+set volume without output muted
+
+
+END
+
+
 # FileIcon is installed via Brew: https://formulae.brew.sh/formula/fileicon
 
 # This script is easily run on startup by using pm2: https://pm2.keymetrics.io/docs/usage/quick-start/
