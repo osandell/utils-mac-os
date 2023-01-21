@@ -1,14 +1,14 @@
 #!/bin/bash
 
-osascript -e "say \"$1\""
+cd $(dirname "$0")
 
 if [ "$1" = "Screen password unlocked" ]; then
   killall LogiMgrDaemon
-  ./sync_git_repos.sh
+  ./sync-git-repos.sh
 elif [ "$1" = "Screen password locked" ]; then
-  ./check_repos_are_pushed.sh
+  ./check-repos-are-pushed.sh
 elif [ "$1" = "Screen was added" ]; then
-  ./position_all_windows.sh
+  ./position-all-windows.sh
 elif [ "$1" = "Screen was removed" ]; then
-  ./position_all_windows.sh
+  ./position-all-windows.sh
 fi
