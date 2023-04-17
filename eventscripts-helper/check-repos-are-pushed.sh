@@ -12,9 +12,8 @@ if [[ "$OUTPUT" != *"nothing to commit"* || "$OUTPUT" != *"Your branch is up to 
     /usr/bin/git --git-dir=/Users/olof/.config-system-specific/ --work-tree=/ commit -m "chrome: update bookmarks"
     /usr/bin/git --git-dir=/Users/olof/.config-system-specific/ --work-tree=/ push
   else
-    /usr/local/bin/switchaudiosource -s "Högtalare i MacBook Pro"
+    # /usr/local/bin/switchaudiosource -s "Högtalare i MacBook Pro"
     osascript -e '
-      set Volume 3
       say "Dont forget to push system specific config"
     '
   fi
@@ -22,9 +21,8 @@ fi
 
 OUTPUT=$(/usr/bin/git --git-dir=/Users/olof/.config-shared/ --work-tree=/Users/olof/ status)
 if [[ "$OUTPUT" != *"nothing to commit"* || "$OUTPUT" != *"Your branch is up to date with"* ]]; then
-  /usr/local/bin/switchaudiosource -s "Högtalare i MacBook Pro"
+  # /usr/local/bin/switchaudiosource -s "Högtalare i MacBook Pro"
   osascript -e '
-    set Volume 3
     say "Dont forget to push shared config"
     '
 fi
@@ -37,9 +35,8 @@ for i in "${FOLDERS[@]}"; do
   OUTPUT=$(cd /Users/olof/dev/osandell/$i && /usr/bin/git status)
   if [[ ("$OUTPUT" != *"nothing to commit"* || "$OUTPUT" != *"Your branch is up to date with"*) && "$OUTPUT" != "" ]]; then
     echo "\n\nDon't forget to push $i!\n\n"
-    /usr/local/bin/switchaudiosource -s "Högtalare i MacBook Pro"
+    # /usr/local/bin/switchaudiosource -s "Högtalare i MacBook Pro"
     osascript -e "
-        set Volume 3
         say \"Dont forget to push $i in osandell\"
         "
   fi
@@ -56,9 +53,8 @@ for i in "${FOLDERS[@]}"; do
     "$OUTPUT" != "" && "$i" != "byon-frontend" && "$i" != "zoo-api" ]]; then # I can't push the byon branch since i don't have permissions for some reason.
     # I don't want to push the Zoo Api since it contains a password.. not sure if it's ok to push it
     echo "\n\nDon't forget to push $i!\n\n"
-    /usr/local/bin/switchaudiosource -s "Högtalare i MacBook Pro"
+    # /usr/local/bin/switchaudiosource -s "Högtalare i MacBook Pro"
     osascript -e "
-        set Volume 3
         say \"Dont forget to push $i in olofgrebban\"
         "
   fi
