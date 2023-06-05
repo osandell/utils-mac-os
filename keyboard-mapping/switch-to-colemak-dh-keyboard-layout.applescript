@@ -10,7 +10,7 @@ delay 0.2
 
 tell application "System Events"
 	launch
-	click menu item "QWERTY" of menu 1 of Â
+	click menu item "Colemak DH" of menu 1 of Â
 		menu bar item 1 of menu bar 2 of Â
 		application process "TextInputMenuAgent"
 end tell
