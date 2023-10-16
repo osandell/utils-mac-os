@@ -29,7 +29,7 @@ on run {action}
 		set foundMediaPlayer to false
 		
 		try
-			tell application "Google Chrome Personal"
+			tell application "FF Personal"
 				if URL of active tab of first window contains "webdevsimplified.com" or URL of active tab of first window contains "udemy.com" or URL of active tab of first window contains "frontendmasters.com" then
 					activate
 					set foundMediaPlayer to true

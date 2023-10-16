@@ -1,5 +1,5 @@
 tell application "System Events"
-	tell process "Notiscenter"
+	tell process "NotificationCenter"
 		repeat
 			# Close this process as soon as all the notifications are gone
 			try
@@ -13,7 +13,6 @@ tell application "System Events"
 			# are collapsed and we need to use another method of closing.
 			tell button 2 of UI element 1 of scroll area 1 of group 1 of theWindow
 				if exists then
-					
 					click
 				else
 					try
@@ -21,7 +20,7 @@ tell application "System Events"
 						
 						# Try to close the whole group first. If that fails, close individual windows.
 						repeat with theAction in theActions
-							if description of theAction is "Rensa alla" then
+							if description of theAction is "Clear all" then
 								tell theWindow
 									perform theAction
 								end tell
@@ -30,7 +29,7 @@ tell application "System Events"
 						end repeat
 						
 						repeat with theAction in theActions
-							if description of theAction is "Stäng" then
+							if description of theAction is "Close" then
 								set closed to true
 								tell theWindow
 									perform theAction
