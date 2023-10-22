@@ -7,11 +7,23 @@ osascript -e 'tell application "System Events" to tell appearance preferences to
 
 cp ~/.config/kitty/themes/solarized-light.conf ~/.config/kitty/current-theme.conf
 
-osascript -e 'tell application "kitty" to activate'
-osascript -e 'tell application "System Events" to keystroke "," using {command down, control down}'
+# From https://github.com/dflock/kitty-save-session
+# Convert this JSON file into a kitty session file:
+socket=$(ls /tmp/mykitty-* 2>/dev/null | head -n 1)
+if [[ -n "$socket" ]]; then
+    export KITTY_LISTEN_ON="unix:$socket"
+    /Applications/kitty.app/Contents/MacOS/kitty @ ls | python3 ~/.config/kitty/kitty-convert-dump.py >~/.config/kitty/kitty-session.kitty
+else
+    echo "No Kitty socket found in /tmp."
+fi
 
-sed -i '' '/"workbench.colorTheme":/c\    
-"workbench.colorTheme": "Solarized Light",' ~/.config/Code/User/settings.json
+osascript -e 'tell application "kitty" to quit'
+osascript -e 'tell application "kitty" to activate'
+
+osascript ~/dev/osandell/set-window-boundaries/set-window-boundaries.applescript kitty primary custom auto 0.41 1 -0.296 0
+
+/usr/bin/sed -i '' '/"workbench.colorTheme":/c\    
+"workbench.colorTheme": "Solarized Light",' /Users/olof/.config/Code/User/settings.json
 
 osascript -e 'tell application "GitKraken" to activate'
 osascript -e 'tell application "System Events" to keystroke "p" using {command down}'
