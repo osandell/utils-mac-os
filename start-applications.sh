@@ -1,6 +1,7 @@
 #!/bin/bash
 
 osascript -e "tell application \"Noteland\" to activate"
+osascript -e "tell application \"TablePlus\" to activate"
 osascript -e "tell application \"kitty\" to activate"
 osascript -e "tell application \"GitKraken\" to activate"
 osascript -e "tell application \"FF Work\" to activate"
