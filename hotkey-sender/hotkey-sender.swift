@@ -70,8 +70,9 @@ func performAction(action: String) {
 
   case "vscode-last-tab":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let result = checkTerminalInTitle(forProcessIdentifier: frontmostApp.processIdentifier)
-      if result == true {
+      let isTerminalInTitle = checkTerminalInTitle(
+        forProcessIdentifier: frontmostApp.processIdentifier)
+      if isTerminalInTitle == true {
         sendKeystroke(
           keyCode: keyMap["insert"]!, modifiers: [.maskControl, .maskAlternate])
       } else {
@@ -84,8 +85,9 @@ func performAction(action: String) {
 
   case "vscode-enlarge-shrink":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let result = checkTerminalInTitle(forProcessIdentifier: frontmostApp.processIdentifier)
-      if result == true {
+      let isTerminalInTitle = checkTerminalInTitle(
+        forProcessIdentifier: frontmostApp.processIdentifier)
+      if isTerminalInTitle == true {
         sendKeystroke(
           keyCode: keyMap["m"]!, modifiers: [.maskControl, .maskShift, .maskAlternate])
       } else {
@@ -101,13 +103,37 @@ func performAction(action: String) {
 
   case "vscode-command-h":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let result = checkTerminalInTitle(forProcessIdentifier: frontmostApp.processIdentifier)
-      if result == true {
+      let isTerminalInTitle = checkTerminalInTitle(
+        forProcessIdentifier: frontmostApp.processIdentifier)
+      if isTerminalInTitle == true {
         sendKeystroke(
           keyCode: keyMap["r"]!, modifiers: [.maskControl])  // History back
       } else {
         sendKeystroke(
           keyCode: keyMap["w"]!, modifiers: [.maskShift, .maskAlternate])  // Console log with variable
+      }
+    }
+
+  case "vscode-command-c":
+    if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+      let isTerminalInTitle = checkTerminalInTitle(
+        forProcessIdentifier: frontmostApp.processIdentifier)
+      if isTerminalInTitle == true {
+
+        // Clear terminal
+        sendKeystroke(
+          keyCode: keyMap["u"]!, modifiers: [.maskControl])
+        sendKeystroke(
+          keyCode: keyMap["k"]!, modifiers: [.maskCommand])
+        sendKeystroke(
+          keyCode: keyMap["enter"]!, modifiers: [])
+      } else {
+
+        // Show hover popup
+        sendKeystroke(
+          keyCode: keyMap["k"]!, modifiers: [.maskCommand])
+        sendKeystroke(
+          keyCode: keyMap["i"]!, modifiers: [.maskCommand])
       }
     }
 

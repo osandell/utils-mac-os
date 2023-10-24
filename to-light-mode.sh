@@ -22,8 +22,7 @@ osascript -e 'tell application "kitty" to activate'
 
 osascript ~/dev/osandell/set-window-boundaries/set-window-boundaries.applescript kitty primary custom auto 0.41 1 -0.296 0
 
-/usr/bin/sed -i '' '/"workbench.colorTheme":/c\    
-"workbench.colorTheme": "Solarized Light",' /Users/olof/.config/Code/User/settings.json
+awk '/"workbench.colorTheme":/ {print "  \"workbench.colorTheme\": \"Solarized Light\","; next}1' /Users/olof/.config/Code/User/settings.json > /tmp/temp.json && mv /tmp/temp.json /Users/olof/.config/Code/User/settings.json 
 
 osascript -e 'tell application "GitKraken" to activate'
 osascript -e 'tell application "System Events" to keystroke "p" using {command down}'

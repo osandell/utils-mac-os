@@ -24,8 +24,7 @@ osascript ~/dev/osandell/set-window-boundaries/set-window-boundaries.applescript
 
 osascript -e 'tell application "System Events" to keystroke "," using {command down, control down}'
 
-sed -i '' '/"workbench.colorTheme":/c\
-"workbench.colorTheme": "Gruvbox Dark Medium",' ~/.config/Code/User/settings.json
+awk '/"workbench.colorTheme":/ {print "  \"workbench.colorTheme\": \"Gruvbox Dark Medium\","; next}1' /Users/olof/.config/Code/User/settings.json > /tmp/temp.json && mv /tmp/temp.json /Users/olof/.config/Code/User/settings.json 
 
 osascript -e 'tell application "GitKraken" to activate'
 osascript -e 'tell application "System Events" to keystroke "p" using {command down}'
