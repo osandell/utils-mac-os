@@ -92,12 +92,10 @@ func performAction(action: String) {
           keyCode: keyMap["m"]!, modifiers: [.maskControl, .maskShift, .maskAlternate])
       } else {
         sendKeystroke(
-          keyCode: keyMap["t"]!, modifiers: [.maskControl, .maskAlternate])
-        sendKeystroke(
-          keyCode: keyMap["t"]!, modifiers: [.maskControl, .maskShift, .maskAlternate])
+          keyCode: keyMap["t"]!, modifiers: [.maskControl, .maskShift, .maskAlternate])  // Toggle panel visibility
         Thread.sleep(forTimeInterval: 0.05)
         sendKeystroke(
-          keyCode: keyMap["d"]!, modifiers: [.maskControl, .maskAlternate])
+          keyCode: keyMap["t"]!, modifiers: [.maskControl, .maskAlternate])
       }
     }
 
