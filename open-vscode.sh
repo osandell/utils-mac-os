@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-open -a "Visual Studio Code"
-
 if [[ -z $1 ]]; then
     # If no argument is provided, open Visual Studio Code in current dir 
     /usr/local/bin/code .
