@@ -1,15 +1,33 @@
+import AVFoundation
 import AppKit
 import CoreGraphics
 import Darwin
 import Foundation
 
-var keepRunning = true
-var currentBundleIdentifier: String? = nil
-let workspace = NSWorkspace.shared
 let fileManager = FileManager.default
 let pipePath = "/tmp/keyPipe"
+let workspace = NSWorkspace.shared
+
+var audioPlayer: AVAudioPlayer?
+var currentBundleIdentifier: String? = nil
+var keepRunning = true
 var primarySpecialWorkspace: pid_t?
 var secondarySpecialWorkspace: pid_t?
+var tertiarySpecialWorkspace: pid_t?
+
+func playSound(fileName: String) {
+  guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else {
+    print("Sound file not found.")
+    return
+  }
+
+  do {
+    audioPlayer = try AVAudioPlayer(contentsOf: url)
+    audioPlayer?.play()
+  } catch {
+    print("Could not load or play sound file.")
+  }
+}
 
 func checkTerminalInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool {
   let app = AXUIElementCreateApplication(processIdentifier)
@@ -41,11 +59,19 @@ func performAction(action: String) {
   case "set-primary-special-workspace":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
       primarySpecialWorkspace = frontmostApp.processIdentifier
+      playSound(fileName: "doorknob-click")
     }
 
   case "set-secondary-special-workspace":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
       secondarySpecialWorkspace = frontmostApp.processIdentifier
+      playSound(fileName: "doorknob-click")
+    }
+
+  case "set-tertiary-special-workspace":
+    if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+      tertiarySpecialWorkspace = frontmostApp.processIdentifier
+      playSound(fileName: "doorknob-click")
     }
 
   case "switch-to-primary-special-workspace":
@@ -66,6 +92,16 @@ func performAction(action: String) {
       app.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
     } else {
       print("No application found with process identifier \(secondarySpecialWorkspace)")
+    }
+
+  case "switch-to-tertiary-special-workspace":
+    guard let tertiarySpecialWorkspace = tertiarySpecialWorkspace else {
+      break
+    }
+    if let app = NSRunningApplication(processIdentifier: tertiarySpecialWorkspace) {
+      app.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
+    } else {
+      print("No application found with process identifier \(tertiarySpecialWorkspace)")
     }
 
   case "vscode-last-tab":
