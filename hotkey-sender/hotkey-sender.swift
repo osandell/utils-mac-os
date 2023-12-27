@@ -52,6 +52,29 @@ func checkTerminalInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool
   return false
 }
 
+func checkLfInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool {
+  let app = AXUIElementCreateApplication(processIdentifier)
+  var frontWindow: CFTypeRef?
+  var title: CFTypeRef?
+
+  let err1 = AXUIElementCopyAttributeValue(
+    app, kAXFocusedWindowAttribute as CFString, &frontWindow)
+
+  if err1 == .success {
+    guard let frontWindowElement = frontWindow as! AXUIElement? else {
+      return false
+    }
+
+    let err2 = AXUIElementCopyAttributeValue(
+      frontWindowElement, kAXTitleAttribute as CFString, &title)
+    if err2 == .success, let titleStr = title as? String {
+      return titleStr.contains("lf")
+    }
+  }
+  print("err1: \(err1)")
+  return false
+}
+
 func performAction(action: String) {
 
   switch action {
@@ -168,6 +191,57 @@ func performAction(action: String) {
           keyCode: keyMap["k"]!, modifiers: [.maskCommand])
         sendKeystroke(
           keyCode: keyMap["i"]!, modifiers: [.maskCommand])
+      }
+    }
+
+  case "command-r":
+    if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+      let isLfInTitle = checkLfInTitle(
+        forProcessIdentifier: frontmostApp.processIdentifier)
+      if isLfInTitle == true {
+
+        // Cut (lf can't handle command mappings so we need to use control)
+        sendKeystroke(
+          keyCode: keyMap["r"]!, modifiers: [.maskControl])
+      } else {
+
+        // Cut
+        sendKeystroke(
+          keyCode: keyMap["x"]!, modifiers: [.maskCommand])
+      }
+    }
+
+  case "command-s":
+    if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+      let isLfInTitle = checkLfInTitle(
+        forProcessIdentifier: frontmostApp.processIdentifier)
+      if isLfInTitle == true {
+
+        // Copy (lf can't handle command mappings so we need to use control)
+        sendKeystroke(
+          keyCode: keyMap["s"]!, modifiers: [.maskControl])
+      } else {
+
+        // Copy
+        sendKeystroke(
+          keyCode: keyMap["c"]!, modifiers: [.maskCommand])
+      }
+    }
+
+  case "command-t":
+    if let frontmostApp = NSWorkspace.shared.frontmostApplication {
+      let isLfInTitle = checkLfInTitle(
+        forProcessIdentifier: frontmostApp.processIdentifier)
+      if isLfInTitle == true {
+
+        // Paste (lf can't handle command mappings so we need to use control)
+        sendKeystroke(
+          keyCode: keyMap["t"]!, modifiers: [.maskControl])
+      } else {
+
+        // Paste
+        sendKeystroke(
+          keyCode: keyMap["v"]!, modifiers: [.maskCommand])
       }
     }
 
