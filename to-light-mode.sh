@@ -7,20 +7,23 @@ osascript -e 'tell application "System Events" to tell appearance preferences to
 
 cp ~/.config/kitty/themes/solarized-light.conf ~/.config/kitty/current-theme.conf
 
-# From https://github.com/dflock/kitty-save-session
-# Convert this JSON file into a kitty session file:
-socket=$(ls /tmp/mykitty-* 2>/dev/null | head -n 1)
-if [[ -n "$socket" ]]; then
-    export KITTY_LISTEN_ON="unix:$socket"
-    /Applications/kitty.app/Contents/MacOS/kitty @ ls | python3 ~/.config/kitty/kitty-convert-dump.py >~/.config/kitty/kitty-session.kitty
-else
-    echo "No Kitty socket found in /tmp."
-fi
+# # From https://github.com/dflock/kitty-save-session
+# # Convert this JSON file into a kitty session file:
+# socket=$(ls /tmp/mykitty-* 2>/dev/null | head -n 1)
+# if [[ -n "$socket" ]]; then
+#     export KITTY_LISTEN_ON="unix:$socket"
+#     /Applications/kitty.app/Contents/MacOS/kitty @ ls | python3 ~/.config/kitty/kitty-convert-dump.py >~/.config/kitty/kitty-session.kitty
+# else
+#     echo "No Kitty socket found in /tmp."
+# fi
 
-osascript -e 'tell application "kitty" to quit'
+# osascript -e 'tell application "kitty" to quit'
+# osascript -e 'tell application "kitty" to activate'
+
+# osascript ~/dev/osandell/set-window-boundaries/set-window-boundaries.applescript kitty primary custom auto 0.406 1 -0.297 0
+
 osascript -e 'tell application "kitty" to activate'
-
-osascript ~/dev/osandell/set-window-boundaries/set-window-boundaries.applescript kitty primary custom auto 0.406 1 -0.297 0
+osascript -e 'tell application "System Events" to keystroke "," using {command down, control down}'
 
 awk '/"workbench.colorTheme":/ {print "  \"workbench.colorTheme\": \"Solarized Light\","; next}1' /Users/olof/.config/Code/User/settings.json >/tmp/temp.json && mv /tmp/temp.json /Users/olof/.config/Code/User/settings.json
 

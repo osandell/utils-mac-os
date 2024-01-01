@@ -6,6 +6,18 @@
 
 # From https://github.com/dflock/kitty-save-session
 # Convert this JSON file into a kitty session file:
+socket=$(ls /tmp/mykitty-* 2>/dev/null | head -n 1)
+if [[ -n "$socket" ]]; then
+    export KITTY_LISTEN_ON="unix:$socket"
+    # Here we could simply do kitty @ ls | python3 ~/.config/kitty/kitty-convert-dump.py >~/.config/kitty/kitty-session.kitty
+    # but I use a method that will also work if invoked form outside of kitty for future reference.
+    /Applications/kitty.app/Contents/MacOS/kitty @ ls | python3 ~/.config/kitty/kitty-convert-dump.py >~/.config/kitty/kitty-session.kitty
+else
+    echo "No Kitty socket found in /tmp."
+fi
+
+# From https://github.com/dflock/kitty-save-session
+# Convert this JSON file into a kitty session file:
 kitty @ ls | python3 ~/.config/kitty/kitty-convert-dump.py >~/.config/kitty/kitty-session.kitty
 
 open -a "FF Personal"
