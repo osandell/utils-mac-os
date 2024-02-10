@@ -15,17 +15,26 @@ var primarySpecialWorkspace: pid_t?
 var secondarySpecialWorkspace: pid_t?
 var tertiarySpecialWorkspace: pid_t?
 
+// Logging function
+func logMessage(_ message: String) {
+  let dateFormatter = DateFormatter()
+  dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+  let timestamp = dateFormatter.string(from: Date())
+  print("[\(timestamp)] \(message)")
+}
+
 func playSound(fileName: String) {
   guard let url = Bundle.main.url(forResource: fileName, withExtension: "mp3") else {
-    print("Sound file not found.")
+    logMessage("Sound file not found for \(fileName).")
     return
   }
 
   do {
     audioPlayer = try AVAudioPlayer(contentsOf: url)
     audioPlayer?.play()
+    logMessage("Playing sound: \(fileName).")
   } catch {
-    print("Could not load or play sound file.")
+    logMessage("Could not load or play sound file: \(error).")
   }
 }
 
@@ -34,11 +43,11 @@ func checkTerminalInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool
   var frontWindow: CFTypeRef?
   var title: CFTypeRef?
 
-  let err1 = AXUIElementCopyAttributeValue(
-    app, kAXFocusedWindowAttribute as CFString, &frontWindow)
+  let err1 = AXUIElementCopyAttributeValue(app, kAXFocusedWindowAttribute as CFString, &frontWindow)
 
   if err1 == .success {
     guard let frontWindowElement = frontWindow as! AXUIElement? else {
+      logMessage("Failed to get front window element for process ID \(processIdentifier).")
       return false
     }
 
@@ -46,9 +55,14 @@ func checkTerminalInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool
       frontWindowElement, kAXTitleAttribute as CFString, &title)
     if err2 == .success, let titleStr = title as? String {
       return titleStr.contains("(Terminal)")
+    } else {
+      logMessage(
+        "Failed to get window title or title does not contain '(Terminal)' for process ID \(processIdentifier)."
+      )
     }
   }
-  print("err1: \(err1)")
+  logMessage(
+    "Error accessing focused window attribute for process ID \(processIdentifier): \(err1).")
   return false
 }
 
@@ -57,11 +71,11 @@ func checkLfInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool {
   var frontWindow: CFTypeRef?
   var title: CFTypeRef?
 
-  let err1 = AXUIElementCopyAttributeValue(
-    app, kAXFocusedWindowAttribute as CFString, &frontWindow)
+  let err1 = AXUIElementCopyAttributeValue(app, kAXFocusedWindowAttribute as CFString, &frontWindow)
 
   if err1 == .success {
     guard let frontWindowElement = frontWindow as! AXUIElement? else {
+      logMessage("Failed to get front window element for process ID \(processIdentifier).")
       return false
     }
 
@@ -69,9 +83,14 @@ func checkLfInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool {
       frontWindowElement, kAXTitleAttribute as CFString, &title)
     if err2 == .success, let titleStr = title as? String {
       return titleStr.contains("lf")
+    } else {
+      logMessage(
+        "Failed to get window title or title does not contain 'lf' for process ID \(processIdentifier)."
+      )
     }
   }
-  print("err1: \(err1)")
+  logMessage(
+    "Error accessing focused window attribute for process ID \(processIdentifier): \(err1).")
   return false
 }
 
@@ -260,25 +279,32 @@ func sendKeystroke(keyCode: CGKeyCode, modifiers: CGEventFlags) {
     up.flags = modifiers
     up.post(tap: CGEventTapLocation.cghidEventTap)
   }
+  logMessage("Sent keystroke: keyCode=\(keyCode), modifiers=\(modifiers).")
 }
 
 let dispatchQueue = DispatchQueue(label: "fileReader")
 dispatchQueue.async {
   while keepRunning {
-    if let reader = FileHandle(forReadingAtPath: "/tmp/keyPipe") {
-      if let input = String(data: reader.readDataToEndOfFile(), encoding: .utf8)?
-        .trimmingCharacters(
-          in: .whitespacesAndNewlines)
+    if let reader = FileHandle(forReadingAtPath: pipePath) {
+      let inputData = reader.readDataToEndOfFile()
+      if let input = String(data: inputData, encoding: .utf8)?.trimmingCharacters(
+        in: .whitespacesAndNewlines), !input.isEmpty
       {
+        logMessage("Received input from pipe: \(input)")
         performAction(action: input)
+      } else {
+        logMessage("No input received or input is empty.")
       }
       reader.closeFile()
+    } else {
+      logMessage("Failed to open pipe for reading at \(pipePath).")
     }
   }
 }
 
 if !fileManager.fileExists(atPath: pipePath) {
   mkfifo(pipePath, 0o600)
+  logMessage("Created named pipe at \(pipePath).")
 }
 
 // SIGINT handling
@@ -396,6 +422,7 @@ let keyMap: [String: CGKeyCode] = [
       let bundleIdentifier = app.bundleIdentifier
     {
       currentBundleIdentifier = bundleIdentifier
+      logMessage("Frontmost application changed: \(bundleIdentifier).")
     }
   }
 }
@@ -410,7 +437,7 @@ workspace.notificationCenter.addObserver(
 
 let signalSource = DispatchSource.makeSignalSource(signal: SIGINT, queue: DispatchQueue.main)
 signalSource.setEventHandler {
-  print("Received SIGINT")
+  logMessage("SIGINT signal source event handler triggered.")
   keepRunning = false
   exit(0)
 }
