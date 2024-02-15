@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+curl -X POST -d "activateDarkMode" http://localhost:57321
+
 Store the name of the current active app
 current_app=$(osascript -e 'tell application "System Events" to get the name of the first process whose frontmost is true')
 
