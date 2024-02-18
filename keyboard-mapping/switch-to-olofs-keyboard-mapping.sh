@@ -1,6 +1,6 @@
 #!/bin/bash
 
-osascript ~/dev/osandell/scripts-osx/keyboard-mapping/switch-to-olofs-keyboard-layout.applescript
+osascript ~/dev/osandell/utils-max-of/keyboard-mapping/switch-to-olofs-keyboard-layout.applescript
 /Library/Application\ Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli --select-profile 'Default'
 osascript -e 'tell application "Code" to activate'
 osascript -e 'delay 1'

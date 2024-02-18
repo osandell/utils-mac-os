@@ -3,7 +3,7 @@
 curl -X POST -d "activateDarkMode" http://localhost:57321
 
 Store the name of the current active app
-current_app=$(osascript -e 'tell application "System Events" to get the name of the first process whose frontmost is true')
+current_app=$(cat /tmp/current_app.txt)
 
 osascript -e 'tell application "System Events" to tell appearance preferences to set dark mode to true'
 
@@ -26,7 +26,9 @@ cp ~/.config/kitty/themes/gruvbox.conf ~/.config/kitty/current-theme.conf
 
 # osascript -e 'tell application "System Events" to keystroke "," using {command down, control down}'
 
-osascript -e 'tell application "kitty" to activate'
+osascript -e 'tell application "kitty-main" to activate'
+osascript -e 'tell application "System Events" to keystroke "," using {command down, control down}'
+osascript -e 'tell application "kitty-lf" to activate'
 osascript -e 'tell application "System Events" to keystroke "," using {command down, control down}'
 
 awk '/"workbench.colorTheme":/ {print "  \"workbench.colorTheme\": \"Gruvbox Dark Medium\","; next}1' /Users/olof/.config/Code/User/settings.json >/tmp/temp.json && mv /tmp/temp.json /Users/olof/.config/Code/User/settings.json
@@ -40,11 +42,12 @@ osascript -e 'tell application "System Events" to key code 36'
 osascript -e 'tell application "System Events" to key code 53'
 osascript -e 'tell application "System Events" to key code 53'
 
-osascript -e 'tell application "kitty" to activate'
+osascript -e 'tell application "kitty-main" to activate'
 
 # Check if the current app is Electron-based, if so, activate VSCode, otherwise activate the originally active app
-if [ "$current_app" == "Electron" ]; then
-    osascript -e 'tell application "Visual Studio Code" to activate'
+if [ "$current_app" == "coding-environment" ]; then
+    open -a "kitty-main"
+    curl -X POST localhost:57321 -d "openCurrentApp"
 else
     osascript -e "tell application \"$current_app\" to activate"
 fi

@@ -48,9 +48,16 @@ NSWorkspace.shared.notificationCenter.addObserver(
       title = value as? String
     }
 
-    if appName == "Code" || appName == "Electron" || (appName == "kitty" && title != "kitty-lf") {  // Assuming "Elecr" was a typo for "Electron"
+    if appName == "Code" || appName == "Electron" || appName == "GitKraken"
+      || (appName == "kitty" && title != "kitty-lf")
+    {  // Assuming "Elecr" was a typo for "Electron"
       print("Code or Electron is frontmost")
-      executeCurlCommand(data: "setIsFrontmost")
+
+      // We make an exception for GitKraken because it causes problems when toggling dark mode
+      if appName != "GitKraken" {
+        executeCurlCommand(data: "setIsFrontmost")
+      }
+
       saveAppName(appName: "coding-environment")
     } else {
       executeCurlCommand(data: "setIsBackground")

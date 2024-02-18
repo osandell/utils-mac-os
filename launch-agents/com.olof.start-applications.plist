@@ -8,7 +8,7 @@
     <array>
         <string>/bin/sh</string>
         <string>-c</string>
-        <string>/Users/olof/dev/osandell/scripts-osx/start-applications.sh >/dev/null 2>&1</string>
+        <string>/Users/olof/dev/osandell/utils-mac-os/start-applications.sh >/dev/null 2>&1</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
