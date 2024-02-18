@@ -58,6 +58,14 @@ NSWorkspace.shared.notificationCenter.addObserver(
         executeCurlCommand(data: "setIsFrontmost")
       }
 
+      if appName == "kitty" && title != "kitty-lf" {
+        executeCurlCommand(data: "setKittyFocused")
+      } else if appName == "Code" {
+        executeCurlCommand(data: "setCodeFocused")
+      } else if appName == "GitKraken" {
+        executeCurlCommand(data: "setGitkrakenFocused")
+      }
+
       saveAppName(appName: "coding-environment")
     } else {
       executeCurlCommand(data: "setIsBackground")
