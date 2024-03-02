@@ -58,12 +58,14 @@ NSWorkspace.shared.notificationCenter.addObserver(
         executeCurlCommand(data: "setIsFrontmost")
       }
 
-      if appName == "kitty" && title != "kitty-lf" {
+      // The purpose of this it to know if we should focus the terminal or the file
+      // explorer when for example toggling back from lazygit. We therefore don't want to
+      // save lazygit as the frontmost app. Only Code and kitty are relevant.
+      if appName == "kitty" && title?.hasPrefix("lazygit") != true {
+        print("Kitty main is frontmost")
         executeCurlCommand(data: "setKittyFocused")
       } else if appName == "Code" {
         executeCurlCommand(data: "setCodeFocused")
-      } else if appName == "GitKraken" {
-        executeCurlCommand(data: "setGitkrakenFocused")
       }
 
       saveAppName(appName: "coding-environment")
