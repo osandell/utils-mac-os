@@ -13,8 +13,17 @@ func executeCurlCommand(data: String) {
   process.launch()
 }
 
-func saveAppName(appName: String) {
-  let filePath = "/tmp/current_app.txt"
+func storeFocusedGlobalAppName(appName: String) {
+  let filePath = "/tmp/focused_global_app.txt"
+  do {
+    try appName.write(toFile: filePath, atomically: true, encoding: .utf8)
+  } catch {
+    print("Failed to write app name to file: \(error)")
+  }
+}
+
+func storeFocusedWorkspaceAppName(appName: String) {
+  let filePath = "/tmp/focused_workspace_app.txt"
   do {
     try appName.write(toFile: filePath, atomically: true, encoding: .utf8)
   } catch {
@@ -48,36 +57,26 @@ NSWorkspace.shared.notificationCenter.addObserver(
       title = value as? String
     }
 
-    if appName == "Code" || appName == "Electron" || appName == "GitKraken"
-      || (appName == "kitty" && title != "kitty-lf")
-    {  // Assuming "Elecr" was a typo for "Electron"
-      print("Code or Electron is frontmost")
-
-      // We make an exception for GitKraken because it causes problems when toggling dark mode
-      if appName != "GitKraken" {
-        executeCurlCommand(data: "setIsFrontmost")
-      }
-
-      // The purpose of this it to know if we should focus the terminal or the file
-      // explorer when for example toggling back from lazygit. We therefore don't want to
-      // save lazygit as the frontmost app. Only Code and kitty are relevant.
-      if appName == "kitty" && title?.hasPrefix("lazygit") != true {
-        print("Kitty main is frontmost")
-        executeCurlCommand(data: "setKittyFocused")
-      } else if appName == "Code" {
-        executeCurlCommand(data: "setCodeFocused")
-      }
-
-      saveAppName(appName: "coding-environment")
+    if title?.hasPrefix("lazygit") == true {
+      executeCurlCommand(data: "setKittyLazygitFocused")
+      storeFocusedGlobalAppName(appName: "kitty-lazygit")
+      storeFocusedWorkspaceAppName(appName: "kitty-lazygit")
+    } else if title == "kitty-lf" {
+      executeCurlCommand(data: "setDefocused")
+      storeFocusedGlobalAppName(appName: "kitty-lf")
+    } else if appName == "kitty" {
+      executeCurlCommand(data: "setKittyMainFocused")
+      storeFocusedGlobalAppName(appName: "kitty-main")
+      storeFocusedWorkspaceAppName(appName: "kitty-main")
+    } else if appName == "Code" {
+      executeCurlCommand(data: "setVscodeFocused")
+      storeFocusedGlobalAppName(appName: "vscode")
+      storeFocusedWorkspaceAppName(appName: "vscode")
+    } else if appName == "Electron" {
+      // We need to ignore the line window
     } else {
-      executeCurlCommand(data: "setIsBackground")
-      if title == "kitty-lf" {
-        print("kitty-lf is frontmost")
-        saveAppName(appName: "kitty-lf")
-      } else {
-        print("The frontmost app is: \(appName), Window title: \(title ?? "Unknown")")
-        saveAppName(appName: appName)
-      }
+      executeCurlCommand(data: "setDefocused")
+      storeFocusedGlobalAppName(appName: appName)
     }
   }
 }
