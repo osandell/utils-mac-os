@@ -31,6 +31,17 @@ func storeFocusedWorkspaceAppName(appName: String) {
   }
 }
 
+func getCurrentWorkspace() -> String? {
+  let filePath = "/tmp/current_workspace"
+  do {
+    return try String(contentsOfFile: filePath, encoding: .utf8).trimmingCharacters(
+      in: .whitespacesAndNewlines)
+  } catch {
+    print("Failed to read current workspace from file: \(error)")
+    return nil
+  }
+}
+
 NSWorkspace.shared.notificationCenter.addObserver(
   forName: NSWorkspace.didActivateApplicationNotification, object: nil, queue: OperationQueue.main
 ) { notification in
@@ -65,9 +76,11 @@ NSWorkspace.shared.notificationCenter.addObserver(
       executeCurlCommand(data: "setDefocused")
       storeFocusedGlobalAppName(appName: "kitty-lf")
     } else if appName == "kitty" {
-      executeCurlCommand(data: "setKittyMainFocused")
-      storeFocusedGlobalAppName(appName: "kitty-main")
-      storeFocusedWorkspaceAppName(appName: "kitty-main")
+      if getCurrentWorkspace() != "GitKraken" {
+        executeCurlCommand(data: "setKittyMainFocused")
+        storeFocusedGlobalAppName(appName: "kitty-main")
+        storeFocusedWorkspaceAppName(appName: "kitty-main")
+      }
     } else if appName == "Code" {
       executeCurlCommand(data: "setVscodeFocused")
       storeFocusedGlobalAppName(appName: "vscode")
