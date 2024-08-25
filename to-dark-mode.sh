@@ -18,7 +18,20 @@ osascript -e 'tell application "kitty-lf" to activate'
 osascript -e 'tell application "System Events" to keystroke "," using {command down, control down}'
 
 # Git diff
-bash "$(dirname "$0")/to-dark-mode-git-diff.sh"
+new_delta_config="[delta]
+syntax-theme = \"gruvbox-dark\"
+light = false
+line-numbers = true
+line-numbers-left-format = \"{nm:>3}│\"
+line-numbers-minus-style = \"#cc241d\"
+line-numbers-right-format = \"{np:>3}│\"
+navigate = false
+side-by-side = false
+true-color = auto
+zero-style = \"syntax\""
+
+# Overwrite the ~/.gitconfig_delta file with the new configuration
+echo "$new_delta_config" >~/.gitconfig_delta
 
 # VSCode
 awk '/"workbench.colorTheme":/ {print "  \"workbench.colorTheme\": \"Gruvbox Dark Medium\","; next}1' /Users/olof/.config/Code/User/settings.json >/tmp/temp.json && mv /tmp/temp.json /Users/olof/.config/Code/User/settings.json
