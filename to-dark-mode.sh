@@ -33,7 +33,11 @@ zero-style = \"syntax\""
 # Overwrite the ~/.gitconfig_delta file with the new configuration
 echo "$new_delta_config" >~/.gitconfig_delta
 
-# VSCode
+# # VSCode
+# awk '/"workbench.colorTheme":/ {print "  \"workbench.colorTheme\": \"Gruvbox Dark Medium\","; next}1' /Users/olof/.config/Code/User/settings.json >/tmp/temp.json && mv /tmp/temp.json /Users/olof/.config/Code/User/settings.json
+# # For some reason the above command doesn't work for the "olof" workspace, so I need to use a local settings.json for that workspace
+# awk '/"workbench.colorTheme":/ {print "  \"workbench.colorTheme\": \"Gruvbox Dark Medium\","; next}1' /Users/olof/.vscode/settings.json >/tmp/temp.json && mv /tmp/temp.json /Users/olof/.vscode/settings.json
+# Cursor
 awk '/"workbench.colorTheme":/ {print "  \"workbench.colorTheme\": \"Gruvbox Dark Medium\","; next}1' /Users/olof/.config/Code/User/settings.json >/tmp/temp.json && mv /tmp/temp.json /Users/olof/.config/Code/User/settings.json
 # For some reason the above command doesn't work for the "olof" workspace, so I need to use a local settings.json for that workspace
 awk '/"workbench.colorTheme":/ {print "  \"workbench.colorTheme\": \"Gruvbox Dark Medium\","; next}1' /Users/olof/.vscode/settings.json >/tmp/temp.json && mv /tmp/temp.json /Users/olof/.vscode/settings.json
@@ -51,16 +55,16 @@ osascript -e 'tell application "System Events" to key code 53'
 # Check if the current app is kitty-main or vscode, if so, activate VSCode, otherwise activate the originally active app
 if [ "$focused_global_app" == "kitty-main" ]; then
     open -a 'Electron'
-    open -a 'Visual Studio Code'
+    open -a 'Cursor'
     open -a 'kitty-main'
     sleep 0.2
     open -a 'kitty-main'
 elif [ "$focused_global_app" == "vscode" ]; then
     open -a 'Electron'
     open -a 'kitty-main'
-    open -a 'Visual Studio Code'
+    open -a 'Cursor'
     sleep 0.2
-    open -a 'Visual Studio Code'
+    open -a 'Cursor'
 else
     osascript -e "tell application \"$focused_global_app\" to activate"
 fi

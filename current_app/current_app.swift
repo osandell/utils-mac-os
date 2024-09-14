@@ -81,7 +81,8 @@ NSWorkspace.shared.notificationCenter.addObserver(
         storeFocusedGlobalAppName(appName: "kitty-main")
         storeFocusedWorkspaceAppName(appName: "kitty-main")
       }
-    } else if appName == "Code" {
+      // } else if appName == "Code" {
+    } else if appName == "Cursor" {
       executeCurlCommand(data: "setVscodeFocused")
       storeFocusedGlobalAppName(appName: "vscode")
       storeFocusedWorkspaceAppName(appName: "vscode")

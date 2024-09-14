@@ -65,16 +65,16 @@ osascript -e 'tell application "System Events" to key code 53'
 # Check if the current app is kitty-main or vscode, if so, activate VSCode, otherwise activate the originally active app
 if [ "$focused_global_app" == "kitty-main" ]; then
     open -a 'Electron'
-    open -a 'Visual Studio Code'
+    open -a 'Cursor'
     open -a 'kitty-main'
     sleep 0.2
     open -a 'kitty-main'
 elif [ "$focused_global_app" == "vscode" ]; then
     open -a 'Electron'
     open -a 'kitty-main'
-    open -a 'Visual Studio Code'
+    open -a 'Cursor'
     sleep 0.2
-    open -a 'Visual Studio Code'
+    open -a 'Cursor'
 else
     osascript -e "tell application \"$focused_global_app\" to activate"
 fi
