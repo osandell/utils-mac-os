@@ -38,7 +38,7 @@ func playSound(fileName: String) {
   }
 }
 
-func checkTerminalInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool {
+func checkChatInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool {
   let app = AXUIElementCreateApplication(processIdentifier)
   var frontWindow: CFTypeRef?
   var title: CFTypeRef?
@@ -54,10 +54,10 @@ func checkTerminalInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool
     let err2 = AXUIElementCopyAttributeValue(
       frontWindowElement, kAXTitleAttribute as CFString, &title)
     if err2 == .success, let titleStr = title as? String {
-      return titleStr.contains("(Terminal)")
+      return titleStr.contains("(Chat)")
     } else {
       logMessage(
-        "Failed to get window title or title does not contain '(Terminal)' for process ID \(processIdentifier)."
+        "Failed to get window title or title does not contain '(Chat)' for process ID \(processIdentifier)."
       )
     }
   }
@@ -147,71 +147,63 @@ func performAction(action: String) {
     }
 
   case "vscode-last-tab":
-    if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let isTerminalInTitle = checkTerminalInTitle(
-        forProcessIdentifier: frontmostApp.processIdentifier)
-      if isTerminalInTitle == true {
-        sendKeystroke(
-          keyCode: keyMap["insert"]!, modifiers: [.maskControl, .maskAlternate])
-      } else {
-        sendKeystroke(
-          keyCode: keyMap["insert"]!, modifiers: [.maskControl, .maskShift, .maskAlternate])
-        sendKeystroke(
-          keyCode: keyMap["enter"]!, modifiers: [])
-      }
-    }
+    sendKeystroke(
+      keyCode: keyMap["insert"]!, modifiers: [.maskControl, .maskShift, .maskAlternate])
+    sendKeystroke(
+      keyCode: keyMap["enter"]!, modifiers: [])
 
   case "vscode-enlarge-shrink":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let isTerminalInTitle = checkTerminalInTitle(
+      let isChatInTitle = checkChatInTitle(
         forProcessIdentifier: frontmostApp.processIdentifier)
-      if isTerminalInTitle == true {
+      if isChatInTitle == true {
+        // Make POST request to localhost:57321
+        let url = URL(string: "http://localhost:57321")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = "toCompactScreen".data(using: .utf8)
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+          if let error = error {
+            logMessage("Error making POST request: \(error.localizedDescription)")
+          } else if let httpResponse = response as? HTTPURLResponse {
+            logMessage("POST request completed with status code: \(httpResponse.statusCode)")
+          }
+        }
+        task.resume()
         sendKeystroke(
-          keyCode: keyMap["m"]!, modifiers: [.maskControl, .maskShift, .maskAlternate])
+          keyCode: keyMap["l"]!, modifiers: [.maskCommand])
+
       } else {
+        // Make POST request to localhost:57321
+        let url = URL(string: "http://localhost:57321")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = "toFullscreen".data(using: .utf8)
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+          if let error = error {
+            logMessage("Error making POST request: \(error.localizedDescription)")
+          } else if let httpResponse = response as? HTTPURLResponse {
+            logMessage("POST request completed with status code: \(httpResponse.statusCode)")
+          }
+        }
+        task.resume()
         sendKeystroke(
-          keyCode: keyMap["t"]!, modifiers: [.maskControl, .maskShift, .maskAlternate])  // Toggle panel visibility
-        Thread.sleep(forTimeInterval: 0.05)
-        sendKeystroke(
-          keyCode: keyMap["t"]!, modifiers: [.maskControl, .maskAlternate])
+          keyCode: keyMap["l"]!, modifiers: [.maskCommand])
       }
     }
 
   case "vscode-command-h":
-    if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let isTerminalInTitle = checkTerminalInTitle(
-        forProcessIdentifier: frontmostApp.processIdentifier)
-      if isTerminalInTitle == true {
-        sendKeystroke(
-          keyCode: keyMap["r"]!, modifiers: [.maskControl])  // History back
-      } else {
-        sendKeystroke(
-          keyCode: keyMap["w"]!, modifiers: [.maskShift, .maskAlternate])  // Console log with variable
-      }
-    }
+    sendKeystroke(
+      keyCode: keyMap["w"]!, modifiers: [.maskShift, .maskAlternate])  // Console log with variable
 
   case "vscode-command-c":
-    if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let isTerminalInTitle = checkTerminalInTitle(
-        forProcessIdentifier: frontmostApp.processIdentifier)
-      if isTerminalInTitle == true {
-
-        // Clear terminal
-        sendKeystroke(
-          keyCode: keyMap["u"]!, modifiers: [.maskControl])
-        sendKeystroke(
-          keyCode: keyMap["k"]!, modifiers: [.maskCommand])
-        sendKeystroke(
-          keyCode: keyMap["enter"]!, modifiers: [])
-      } else {
-
-        // Show hover popup
-        sendKeystroke(
-          keyCode: keyMap["k"]!, modifiers: [.maskCommand])
-        sendKeystroke(
-          keyCode: keyMap["i"]!, modifiers: [.maskCommand])
-      }
-    }
+    // Show hover popup
+    sendKeystroke(
+      keyCode: keyMap["k"]!, modifiers: [.maskCommand])
+    sendKeystroke(
+      keyCode: keyMap["i"]!, modifiers: [.maskCommand])
 
   case "command-r":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
