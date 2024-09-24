@@ -72,7 +72,7 @@ NSWorkspace.shared.notificationCenter.addObserver(
       executeCurlCommand(data: "setKittyLazygitFocused")
       storeFocusedGlobalAppName(appName: "kitty-lazygit")
       storeFocusedWorkspaceAppName(appName: "kitty-lazygit")
-    } else if title == "kitty-lf" {
+    } else if title == "kitty-lf" || title == "lf" || title == "/Applications/kitty-lf.app" {
       executeCurlCommand(data: "setDefocused")
       storeFocusedGlobalAppName(appName: "kitty-lf")
     } else if appName == "kitty" {
