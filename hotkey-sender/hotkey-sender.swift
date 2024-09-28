@@ -95,8 +95,11 @@ func checkLfInTitle(forProcessIdentifier processIdentifier: pid_t) -> Bool {
 }
 
 func performAction(action: String) {
+  let components = action.split(separator: " ", maxSplits: 1, omittingEmptySubsequences: true)
 
-  switch action {
+  guard let command = components.first else { return }
+
+  switch command {
 
   case "set-primary-special-workspace":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
@@ -121,7 +124,7 @@ func performAction(action: String) {
       break
     }
     if let app = NSRunningApplication(processIdentifier: primarySpecialWorkspace) {
-      app.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
+      app.activate(options: [.activateAllWindows])  // Removed deprecated option
     } else {
       print("No application found with process identifier \(primarySpecialWorkspace)")
     }
@@ -131,7 +134,7 @@ func performAction(action: String) {
       break
     }
     if let app = NSRunningApplication(processIdentifier: secondarySpecialWorkspace) {
-      app.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
+      app.activate(options: [.activateAllWindows])  // Removed deprecated option
     } else {
       print("No application found with process identifier \(secondarySpecialWorkspace)")
     }
@@ -141,16 +144,16 @@ func performAction(action: String) {
       break
     }
     if let app = NSRunningApplication(processIdentifier: tertiarySpecialWorkspace) {
-      app.activate(options: [.activateAllWindows, .activateIgnoringOtherApps])
+      app.activate(options: [.activateAllWindows])  // Removed deprecated option
     } else {
       print("No application found with process identifier \(tertiarySpecialWorkspace)")
     }
 
   case "vscode-last-tab":
     sendKeystroke(
-      keyCode: keyMap["insert"]!, modifiers: [.maskControl, .maskShift, .maskAlternate])
+      keyCode: keyMap["insert"]!.keyCode, modifiers: [.maskControl, .maskShift, .maskAlternate])
     sendKeystroke(
-      keyCode: keyMap["enter"]!, modifiers: [])
+      keyCode: keyMap["enter"]!.keyCode, modifiers: [])
 
   case "vscode-enlarge-shrink":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
@@ -172,7 +175,7 @@ func performAction(action: String) {
         }
         task.resume()
         sendKeystroke(
-          keyCode: keyMap["l"]!, modifiers: [.maskCommand])
+          keyCode: keyMap["l"]!.keyCode, modifiers: [.maskCommand])
 
       } else {
         // Make POST request to localhost:57321
@@ -190,69 +193,72 @@ func performAction(action: String) {
         }
         task.resume()
         sendKeystroke(
-          keyCode: keyMap["l"]!, modifiers: [.maskCommand])
+          keyCode: keyMap["l"]!.keyCode, modifiers: [.maskCommand])
       }
     }
 
   case "vscode-command-h":
-    sendKeystroke(
-      keyCode: keyMap["w"]!, modifiers: [.maskShift, .maskAlternate])  // Console log with variable
+    sendKeystroke(keyCode: keyMap["w"]!.keyCode, modifiers: [.maskShift, .maskAlternate])  // Console log with variable
 
   case "vscode-command-c":
     // Show hover popup
-    sendKeystroke(
-      keyCode: keyMap["k"]!, modifiers: [.maskCommand])
-    sendKeystroke(
-      keyCode: keyMap["i"]!, modifiers: [.maskCommand])
+    sendKeystroke(keyCode: keyMap["k"]!.keyCode, modifiers: [.maskCommand])
+    sendKeystroke(keyCode: keyMap["i"]!.keyCode, modifiers: [.maskCommand])
 
   case "command-r":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let isLfInTitle = checkLfInTitle(
-        forProcessIdentifier: frontmostApp.processIdentifier)
-      if isLfInTitle == true {
-
+      let isLfInTitle = checkLfInTitle(forProcessIdentifier: frontmostApp.processIdentifier)
+      if isLfInTitle {
         // Cut (lf can't handle command mappings so we need to use control)
-        sendKeystroke(
-          keyCode: keyMap["r"]!, modifiers: [.maskControl])
+        sendKeystroke(keyCode: keyMap["r"]!.keyCode, modifiers: [.maskControl])
       } else {
-
         // Cut
-        sendKeystroke(
-          keyCode: keyMap["x"]!, modifiers: [.maskCommand])
+        sendKeystroke(keyCode: keyMap["x"]!.keyCode, modifiers: [.maskCommand])
       }
     }
 
   case "command-s":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let isLfInTitle = checkLfInTitle(
-        forProcessIdentifier: frontmostApp.processIdentifier)
-      if isLfInTitle == true {
-
+      let isLfInTitle = checkLfInTitle(forProcessIdentifier: frontmostApp.processIdentifier)
+      if isLfInTitle {
         // Copy (lf can't handle command mappings so we need to use control)
-        sendKeystroke(
-          keyCode: keyMap["s"]!, modifiers: [.maskControl])
+        sendKeystroke(keyCode: keyMap["s"]!.keyCode, modifiers: [.maskControl])
       } else {
-
         // Copy
-        sendKeystroke(
-          keyCode: keyMap["c"]!, modifiers: [.maskCommand])
+        sendKeystroke(keyCode: keyMap["c"]!.keyCode, modifiers: [.maskCommand])
       }
     }
 
   case "command-t":
     if let frontmostApp = NSWorkspace.shared.frontmostApplication {
-      let isLfInTitle = checkLfInTitle(
-        forProcessIdentifier: frontmostApp.processIdentifier)
-      if isLfInTitle == true {
-
+      let isLfInTitle = checkLfInTitle(forProcessIdentifier: frontmostApp.processIdentifier)
+      if isLfInTitle {
         // Paste (lf can't handle command mappings so we need to use control)
-        sendKeystroke(
-          keyCode: keyMap["t"]!, modifiers: [.maskControl])
+        sendKeystroke(keyCode: keyMap["t"]!.keyCode, modifiers: [.maskControl])
       } else {
-
         // Paste
-        sendKeystroke(
-          keyCode: keyMap["v"]!, modifiers: [.maskCommand])
+        sendKeystroke(keyCode: keyMap["v"]!.keyCode, modifiers: [.maskCommand])
+      }
+    }
+
+  case "paste":
+    if components.count > 1 {
+      let textToType = components[1]
+      for character in textToType {
+        print("Character: \(character)")
+
+        let charString = String(character)
+
+        if charString == "~" {
+          let keyCode = keyMap["~"]!
+          // Send the ~ character using maskAlternate and then press space
+          sendKeystroke(keyCode: keyCode.keyCode, modifiers: keyCode.modifiers)
+          sendKeystroke(keyCode: keyMap[" "]!.keyCode, modifiers: [])  // Press space
+        } else if let keyCode = keyMap[charString] {
+          sendKeystroke(keyCode: keyCode.keyCode, modifiers: keyCode.modifiers)
+        } else {
+          logMessage("Key code not found for character: \(charString)")
+        }
       }
     }
 
@@ -271,7 +277,10 @@ func sendKeystroke(keyCode: CGKeyCode, modifiers: CGEventFlags) {
     up.flags = modifiers
     up.post(tap: CGEventTapLocation.cghidEventTap)
   }
-  logMessage("Sent keystroke: keyCode=\(keyCode), modifiers=\(modifiers).")
+  // Log keyCode and modifiers in hexadecimal format
+  logMessage(
+    "Sent keystroke: keyCode=0x\(String(keyCode, radix: 16).uppercased()), modifiers=0x\(String(modifiers.rawValue, radix: 16).uppercased())."
+  )
 }
 
 let dispatchQueue = DispatchQueue(label: "fileReader")
@@ -309,102 +318,65 @@ let modMap: [String: CGEventFlags] = [
   "option": .maskAlternate,
 ]
 
-let keyMap: [String: CGKeyCode] = [
-  "a": 0x00,
-  "s": 0x01,
-  "d": 0x02,
-  "f": 0x03,
-  "h": 0x04,
-  "g": 0x05,
-  "z": 0x06,
-  "x": 0x07,
-  "c": 0x08,
-  "v": 0x09,
-  "b": 0x0B,
-  "q": 0x0C,
-  "w": 0x0D,
-  "e": 0x0E,
-  "r": 0x0F,
-  "y": 0x10,
-  "t": 0x11,
-  "1": 0x12,
-  "2": 0x13,
-  "3": 0x14,
-  "4": 0x15,
-  "6": 0x16,
-  "5": 0x17,
-  "=": 0x18,
-  "9": 0x19,
-  "7": 0x1A,
-  "-": 0x1B,
-  "8": 0x1C,
-  "0": 0x1D,
-  "]": 0x1E,
-  "o": 0x1F,
-  "u": 0x20,
-  "[": 0x21,
-  "i": 0x22,
-  "p": 0x23,
-  "l": 0x25,
-  "j": 0x26,
-  "’": 0x27,
-  "k": 0x28,
-  ";": 0x29,
-  "\\": 0x2A,
-  ",": 0x2B,
-  "/": 0x2C,
-  "n": 0x2D,
-  "m": 0x2E,
-  ".": 0x2F,
-  "space": 0x31,
-  "`": 0x32,
-  "delete": 0x33,
-  "enter": 0x24,
-  "tab": 0x30,
-  "escape": 0x35,
-  "command": 0x37,
-  "shift": 0x38,
-  "capslock": 0x39,
-  "option": 0x3A,
-  "control": 0x3B,
-  "rightShift": 0x3C,
-  "rightOption": 0x3D,
-  "rightControl": 0x3E,
-  "function": 0x3F,
-  "f17": 0x40,
-  "volumeUp": 0x48,
-  "volumeDown": 0x49,
-  "mute": 0x4A,
-  "f18": 0x4F,
-  "f19": 0x50,
-  "f20": 0x5A,
-  "f5": 0x60,
-  "f6": 0x61,
-  "f7": 0x62,
-  "f3": 0x63,
-  "f8": 0x64,
-  "f9": 0x65,
-  "f11": 0x67,
-  "f13": 0x69,
-  "f16": 0x6A,
-  "f14": 0x6B,
-  "f10": 0x6D,
-  "f12": 0x6F,
-  "f15": 0x71,
-  "insert": 0x72,
-  "home": 0x73,
-  "pgup": 0x74,
-  "forwardDelete": 0x75,
-  "f4": 0x76,
-  "end": 0x77,
-  "f2": 0x78,
-  "pgdown": 0x79,
-  "f1": 0x7A,
-  "left": 0x7B,
-  "right": 0x7C,
-  "down": 0x7D,
-  "up": 0x7E,
-
+let keyMap: [String: (keyCode: CGKeyCode, modifiers: CGEventFlags)] = [
+  "a": (0x00, []), "A": (0x00, .maskShift),
+  "s": (0x01, []), "S": (0x01, .maskShift),
+  "d": (0x02, []), "D": (0x02, .maskShift),
+  "f": (0x03, []), "F": (0x03, .maskShift),
+  "h": (0x04, []), "H": (0x04, .maskShift),
+  "g": (0x05, []), "G": (0x05, .maskShift),
+  "z": (0x06, []), "Z": (0x06, .maskShift),
+  "x": (0x07, []), "X": (0x07, .maskShift),
+  "c": (0x08, []), "C": (0x08, .maskShift),
+  "v": (0x09, []), "V": (0x09, .maskShift),
+  "b": (0x0B, []), "B": (0x0B, .maskShift),
+  "q": (0x0C, []), "Q": (0x0C, .maskShift),
+  "w": (0x0D, []), "W": (0x0D, .maskShift),
+  "e": (0x0E, []), "E": (0x0E, .maskShift),
+  "r": (0x0F, []), "R": (0x0F, .maskShift),
+  "y": (0x10, []), "Y": (0x10, .maskShift),
+  "t": (0x11, []), "T": (0x11, .maskShift),
+  "u": (0x20, []), "U": (0x20, .maskShift),
+  "i": (0x22, []), "I": (0x22, .maskShift),
+  "o": (0x1F, []), "O": (0x1F, .maskShift),
+  "p": (0x23, []), "P": (0x23, .maskShift),
+  "l": (0x25, []), "L": (0x25, .maskShift),
+  "j": (0x26, []), "J": (0x26, .maskShift),
+  "k": (0x28, []), "K": (0x28, .maskShift),
+  "n": (0x2D, []), "N": (0x2D, .maskShift),
+  "m": (0x2E, []), "M": (0x2E, .maskShift),
+  "ö": (0x29, []), "Ö": (0x29, .maskShift),
+  "å": (0x21, []), "Å": (0x21, .maskShift),
+  "ä": (0x27, []), "Ä": (0x27, .maskShift),
+  "1": (0x12, []), "!": (0x12, .maskShift),
+  "2": (0x13, []), "\"": (0x13, .maskShift),
+  "@": (0x13, .maskAlternate),
+  "3": (0x14, []), "#": (0x14, .maskShift),
+  "4": (0x15, []), "€": (0x15, .maskShift),
+  "$": (0x15, .maskAlternate),
+  "5": (0x17, []), "%": (0x17, .maskShift),
+  "∞": (0x17, .maskAlternate),
+  "6": (0x16, []), "&": (0x16, .maskShift),
+  "7": (0x1A, []), "/": (0x1A, .maskShift),
+  "{": (0x1A, .maskAlternate),
+  "8": (0x1C, []), "(": (0x1C, .maskShift),
+  "9": (0x19, []), ")": (0x19, .maskShift),
+  "0": (0x1D, []), "=": (0x1D, .maskShift),
+  "}": (0x1D, .maskAlternate),
+  "+": (0x1B, []), "?": (0x1B, .maskShift),
+  "\\": (0x1B, .maskAlternate),
+  "[": (0x18, []), "`": (0x18, .maskShift),
+  "]": (0x1E, []), "^": (0x1E, .maskShift),
+  "~": (0x1E, .maskAlternate),
+  "'": (0x2A, []), "*": (0x2A, .maskShift),
+  "™": (0x2A, .maskAlternate),
+  ",": (0x2B, []), ";": (0x2B, .maskShift),
+  ".": (0x2F, []), ":": (0x2F, .maskShift),
+  "-": (0x2C, []), "_": (0x2C, .maskShift),
+  "<": (0x32, []), ">": (0x32, .maskShift),
+  "|": (0x32, .maskAlternate),
+  "§": (0x0A, []), "°": (0x0A, .maskShift),
+  " ": (0x33, []),
 ]
 
 @objc class FrontmostAppObserver: NSObject {
