@@ -197,9 +197,6 @@ func performAction(action: String) {
       }
     }
 
-  case "vscode-command-h":
-    sendKeystroke(keyCode: keyMap["w"]!.keyCode, modifiers: [.maskShift, .maskAlternate])  // Console log with variable
-
   case "vscode-command-c":
     // Show hover popup
     sendKeystroke(keyCode: keyMap["k"]!.keyCode, modifiers: [.maskCommand])
